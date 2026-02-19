@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - MozAcademy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+
+<div class="auth-card" style="max-width:520px;">
+  <div class="auth-logo">Moz<span>Academy</span></div>
+  <p class="auth-tagline">Crie sua conta grátis e comece a aprender hoje!</p>
+
+  <div id="alertBox" class="hidden"></div>
+
+  <form id="cadastroForm" novalidate>
+    <div class="form-group">
+      <label class="form-label">Nome Completo</label>
+      <div class="input-group">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <input type="text" id="nome" class="form-control" placeholder="Seu nome completo" required>
+      </div>
+      <span class="form-error hidden" id="nomeErr">Por favor, insira seu nome.</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <div class="input-group">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <input type="email" id="email" class="form-control" placeholder="seu@email.com" required>
+      </div>
+      <span class="form-error hidden" id="emailErr">Email inválido.</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <div class="input-group">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="senha" class="form-control" placeholder="Mínimo 6 dígitos" required minlength="6">
+        </div>
+        <span class="form-error hidden" id="senhaErr">Mínimo 6 caracteres.</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirmar Senha</label>
+        <div class="input-group">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="confirmarSenha" class="form-control" placeholder="Repita a senha" required>
+        </div>
+        <span class="form-error hidden" id="confirmErr">Senhas não coincidem.</span>
+      </div>
+    </div>
+
+    <!-- Password strength -->
+    <div class="form-group" style="margin-top:-8px;">
+      <div style="display:flex;gap:4px;margin-bottom:4px;" id="strengthBars">
+        <div style="height:4px;flex:1;border-radius:99px;background:var(--border);transition:background .3s;" id="bar1"></div>
+        <div style="height:4px;flex:1;border-radius:99px;background:var(--border);transition:background .3s;" id="bar2"></div>
+        <div style="height:4px;flex:1;border-radius:99px;background:var(--border);transition:background .3s;" id="bar3"></div>
+        <div style="height:4px;flex:1;border-radius:99px;background:var(--border);transition:background .3s;" id="bar4"></div>
+      </div>
+      <span class="form-hint" id="strengthLabel">Digite uma senha forte</span>
+    </div>
+
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:24px;">
+      <input type="checkbox" id="termos" style="width:16px;height:16px;margin-top:2px;cursor:pointer;" required>
+      <label for="termos" style="font-size:.82rem;cursor:pointer;color:var(--text-secondary);">
+        Li e aceito os <a href="#" style="color:var(--accent);">Termos de Uso</a> e a <a href="#" style="color:var(--accent);">Política de Privacidade</a> da MozAcademy.
+      </label>
+    </div>
+
+    <button type="submit" class="btn btn-accent btn-block btn-lg" id="registerBtn">
+      <span id="btnText">Criar Minha Conta</span>
+      <span class="spinner hidden" id="btnSpinner" style="width:18px;height:18px;border-width:2px;"></span>
+    </button>
+  </form>
+
+  <p style="text-align:center; margin-top:24px; font-size:.875rem; color:var(--text-secondary);">
+    Já tem conta? <a href="login.html" style="color:var(--accent); font-weight:600;">Entrar</a>
+  </p>
+  <p style="text-align:center; margin-top:10px;">
+    <a href="index.html" style="font-size:.82rem; color:var(--text-muted);">← Voltar ao início</a>
+  </p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+// Password strength checker
+document.getElementById('senha').addEventListener('input', function() {
+  const val = this.value;
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+
+  const colors = ['', '#ef4444', '#f59e0b', '#22c55e', '#16a34a'];
+  const labels = ['', 'Fraca', 'Regular', 'Boa', 'Excelente'];
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`bar${i}`).style.background = i <= score ? colors[score] : 'var(--border)';
+  }
+  document.getElementById('strengthLabel').textContent = val ? labels[score] || 'Fraca' : 'Digite uma senha forte';
+  document.getElementById('strengthLabel').style.color = colors[score] || 'var(--text-muted)';
+});
+
+// Form submit
+document.getElementById('cadastroForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  let valid = true;
+
+  const nome = document.getElementById('nome').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const confirmar = document.getElementById('confirmarSenha').value;
+  const termos = document.getElementById('termos').checked;
+
+  // Validate
+  const show = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
+  show('nomeErr', !nome);
+  show('emailErr', !email || !/\S+@\S+\.\S+/.test(email));
+  show('senhaErr', senha.length < 6);
+  show('confirmErr', senha !== confirmar);
+  valid = nome && email && /\S+@\S+\.\S+/.test(email) && senha.length >= 6 && senha === confirmar && termos;
+
+  if (!termos) {
+    showAlert('Você precisa aceitar os Termos de Uso para continuar.', 'warning');
+    return;
+  }
+  if (!valid) return;
+
+  const btn = document.getElementById('registerBtn');
+  const btnText = document.getElementById('btnText');
+  const spinner = document.getElementById('btnSpinner');
+
+  btn.disabled = true;
+  btnText.textContent = 'Criando conta...';
+  spinner.classList.remove('hidden');
+
+  try {
+    const user = await DB.createUser(nome, email, senha);
+    localStorage.setItem('moz_user', JSON.stringify(user));
+    App.currentUser = user;
+    App.toast('Conta criada com sucesso! Bem-vindo(a)!', 'success');
+    setTimeout(() => window.location.href = 'dashboard.html', 1000);
+  } catch (err) {
+    showAlert(err.message || 'Erro ao criar conta. Tente novamente.', 'danger');
+    btn.disabled = false;
+    btnText.textContent = 'Criar Minha Conta';
+    spinner.classList.add('hidden');
+  }
+});
+
+function showAlert(msg, type) {
+  const box = document.getElementById('alertBox');
+  box.className = `alert alert-${type} mb-4`;
+  box.textContent = msg;
+}
+</script>
+</body>
+</html>

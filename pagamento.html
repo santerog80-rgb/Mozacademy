@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento - MozAcademy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body style="background:var(--surface-2);">
+
+<!-- Nav -->
+<nav class="nav-public">
+  <a href="index.html" class="topbar-brand">Moz<span>Academy</span></a>
+  <div class="topbar-actions">
+    <a href="dashboard.html" class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,.3);">← Dashboard</a>
+  </div>
+</nav>
+
+<div style="max-width:900px;margin:100px auto 40px;padding:0 20px;">
+  <div style="display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start;">
+
+    <!-- Payment Form -->
+    <div>
+      <h2 style="margin-bottom:24px;">Finalizar Pagamento</h2>
+
+      <!-- Step 1: Method -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h4>1. Escolha o método de pagamento</h4>
+        </div>
+        <div class="card-body">
+          <div class="payment-methods" id="paymentMethods">
+
+            <!-- M-Pesa -->
+            <div class="payment-method" onclick="selectMethod('mpesa',this)" id="method-mpesa">
+              <div style="width:60px;height:40px;background:#e00020;border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#fff;font-weight:900;font-size:.85rem;letter-spacing:-1px;">M-PESA</div>
+              <div class="payment-method-name">M-Pesa</div>
+            </div>
+
+            <!-- E-Mola -->
+            <div class="payment-method" onclick="selectMethod('emola',this)" id="method-emola">
+              <div style="width:60px;height:40px;background:#0077c8;border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#fff;font-weight:900;font-size:.75rem;letter-spacing:-0.5px;">e-MOLA</div>
+              <div class="payment-method-name">e-Mola</div>
+            </div>
+
+            <!-- mKesh -->
+            <div class="payment-method" onclick="selectMethod('mkesh',this)" id="method-mkesh">
+              <div style="width:60px;height:40px;background:#f90;border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#fff;font-weight:900;font-size:.8rem;">mKesh</div>
+              <div class="payment-method-name">mKesh</div>
+            </div>
+
+            <!-- Cartão -->
+            <div class="payment-method" onclick="selectMethod('cartao',this)" id="method-cartao">
+              <div style="width:60px;height:40px;background:linear-gradient(135deg,#1a1f71,#0066b2);border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#fff;font-size:.7rem;text-align:center;line-height:1.2;">VISA<br>MC</div>
+              <div class="payment-method-name">Cartão</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Details -->
+      <div class="card mb-4" id="detailsCard">
+        <div class="card-header">
+          <h4>2. Dados do Pagamento</h4>
+        </div>
+        <div class="card-body">
+
+          <!-- Mobile money form -->
+          <div id="mobileForm">
+            <div class="form-group">
+              <label class="form-label">Número de Telefone</label>
+              <div class="input-group">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 10.23 19.79 19.79 0 0 1 1.61 1.6 2 2 0 0 1 3.6 0h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 7.91a16 16 0 0 0 6.13 6.13l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <input type="tel" id="phoneNumber" class="form-control" placeholder="84 000 0000 / 85 000 0000" maxlength="12">
+              </div>
+              <p class="form-hint" id="phoneHint">Digite o número registado na sua carteira.</p>
+            </div>
+
+            <div class="alert alert-info">
+              <div>
+                <strong>Como funciona:</strong><br>
+                1. Clique em "Pagar Agora"<br>
+                2. Receberá uma notificação na sua carteira<br>
+                3. Confirme o pagamento no seu telemóvel<br>
+                4. Acesso liberado automaticamente!
+              </div>
+            </div>
+          </div>
+
+          <!-- Card form -->
+          <div id="cardForm" class="hidden">
+            <div class="form-group">
+              <label class="form-label">Número do Cartão</label>
+              <input type="text" id="cardNumber" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCard(this)">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="form-group">
+                <label class="form-label">Validade</label>
+                <input type="text" id="cardExpiry" class="form-control" placeholder="MM/AA" maxlength="5" oninput="formatExpiry(this)">
+              </div>
+              <div class="form-group">
+                <label class="form-label">CVV</label>
+                <input type="text" id="cardCVV" class="form-control" placeholder="000" maxlength="4">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nome no Cartão</label>
+              <input type="text" id="cardName" class="form-control" placeholder="Nome como aparece no cartão">
+            </div>
+            <div class="alert alert-info">
+              <span>🔒 Pagamento seguro e criptografado (SSL/TLS)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pay Button -->
+      <button class="btn btn-accent btn-block btn-lg" id="payBtn" onclick="processPayment()" disabled>
+        🔒 Pagar <span id="payBtnAmount"></span>
+      </button>
+      <p style="text-align:center;font-size:.78rem;color:var(--text-muted);margin-top:10px;">Pagamento 100% seguro e protegido</p>
+    </div>
+
+    <!-- Order Summary -->
+    <div>
+      <div class="card" style="position:sticky;top:84px;">
+        <div class="card-header"><h4>Resumo do Pedido</h4></div>
+        <div class="card-body">
+          <div style="display:flex;gap:14px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border);">
+            <div style="width:72px;height:52px;border-radius:8px;background:var(--primary);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🎓</div>
+            <div>
+              <div style="font-weight:600;font-size:.88rem;line-height:1.4;" id="summaryTitle">Carregando...</div>
+              <div style="font-size:.75rem;color:var(--text-muted);margin-top:4px;" id="summaryType">Inscrição no Curso</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:.875rem;">
+            <div style="display:flex;justify-content:space-between;">
+              <span class="text-muted">Subtotal</span>
+              <span id="subtotal">0 MT</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+              <span class="text-muted">IVA (0%)</span>
+              <span>0 MT</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-weight:700;font-size:1rem;padding-top:10px;border-top:1px solid var(--border);">
+              <span>Total</span>
+              <span style="color:var(--accent-hover);" id="totalAmount">0 MT</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding:12px;background:var(--surface-2);border-radius:var(--radius-sm);font-size:.78rem;color:var(--text-muted);">
+            ✓ Acesso vitalício ao curso<br>
+            ✓ Certificado de conclusão<br>
+            ✓ Material complementar em PDF<br>
+            ✓ Garantia de satisfação
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal" style="max-width:460px;text-align:center;">
+    <div class="modal-body" style="padding:48px 36px;">
+      <div style="font-size:4rem;margin-bottom:16px;">🎉</div>
+      <h3 style="margin-bottom:10px;">Pagamento Processado!</h3>
+      <p class="text-muted mb-4">Seu pagamento foi enviado para processamento. Você receberá uma confirmação em breve.</p>
+      <div class="alert alert-success mb-4" id="successDetails"></div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <a href="dashboard.html" class="btn btn-primary">Ir ao Dashboard</a>
+        <a href="#" id="certBtn" class="btn btn-accent" onclick="goToCert()">🏆 Ver Certificado</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+let user, courseId, courseTitle, valor, tipo, selectedMethod = '';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const stored = localStorage.getItem('moz_user');
+  if (!stored) { window.location.href = 'login.html'; return; }
+  user = JSON.parse(stored);
+
+  courseId = Utils.getQueryParam('id');
+  courseTitle = decodeURIComponent(Utils.getQueryParam('titulo') || 'Curso');
+  valor = parseFloat(Utils.getQueryParam('valor') || '0');
+  tipo = Utils.getQueryParam('tipo') || 'curso';
+
+  // Update summary
+  document.getElementById('summaryTitle').textContent = courseTitle;
+  document.getElementById('summaryType').textContent = tipo === 'certificado' ? 'Emissão de Certificado' : 'Inscrição no Curso';
+
+  const valorCert = tipo === 'certificado' ? 350 : valor;
+  if (tipo === 'certificado') valor = 350;
+
+  const formatted = Utils.formatPrice(valor);
+  document.getElementById('subtotal').textContent = formatted;
+  document.getElementById('totalAmount').textContent = formatted;
+  document.getElementById('payBtnAmount').textContent = formatted;
+});
+
+function selectMethod(method, el) {
+  selectedMethod = method;
+  document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('payBtn').disabled = false;
+
+  const isMobile = ['mpesa', 'emola', 'mkesh'].includes(method);
+  document.getElementById('mobileForm').classList.toggle('hidden', !isMobile);
+  document.getElementById('cardForm').classList.toggle('hidden', isMobile);
+
+  const hints = { mpesa: 'Número M-Pesa (ex: 84 XXX XXXX)', emola: 'Número e-Mola (ex: 84 XXX XXXX)', mkesh: 'Número mKesh (ex: 86 XXX XXXX)' };
+  if (hints[method]) document.getElementById('phoneHint').textContent = hints[method];
+}
+
+async function processPayment() {
+  if (!selectedMethod) { App.toast('Selecione um método de pagamento.', 'warning'); return; }
+
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;"></span> Processando...';
+
+  try {
+    // Validate fields
+    if (['mpesa','emola','mkesh'].includes(selectedMethod)) {
+      const phone = document.getElementById('phoneNumber').value.trim();
+      if (!phone || phone.length < 9) {
+        App.toast('Digite um número de telefone válido.', 'warning');
+        resetBtn(); return;
+      }
+    } else {
+      const num = document.getElementById('cardNumber').value.replace(/\s/g,'');
+      if (num.length < 16) {
+        App.toast('Número do cartão inválido.', 'warning');
+        resetBtn(); return;
+      }
+    }
+
+    // Create payment record
+    const payment = await DB.createPayment(user.id, courseId, valor, selectedMethod);
+
+    // Simulate payment processing (2s)
+    await new Promise(r => setTimeout(r, 2000));
+
+    // Approve payment (in production this would be a webhook)
+    await DB.approvePayment(payment.id);
+
+    // If course payment, enroll
+    if (tipo !== 'certificado') {
+      await DB.enroll(user.id, courseId);
+    } else {
+      // Create certificate
+      await DB.createCertificate(user.id, courseId);
+    }
+
+    // Show success
+    document.getElementById('successDetails').innerHTML = `
+      <strong>Método:</strong> ${selectedMethod.toUpperCase()}<br>
+      <strong>Valor:</strong> ${Utils.formatPrice(valor)}<br>
+      <strong>Status:</strong> ✅ Aprovado
+    `;
+    document.getElementById('successModal').classList.add('open');
+
+    // If cert, show cert button
+    if (tipo === 'certificado') {
+      document.getElementById('certBtn').style.display = 'flex';
+    }
+
+  } catch (err) {
+    App.toast('Erro ao processar pagamento: ' + err.message, 'error');
+    resetBtn();
+  }
+}
+
+function resetBtn() {
+  const btn = document.getElementById('payBtn');
+  btn.disabled = false;
+  btn.innerHTML = `🔒 Pagar ${Utils.formatPrice(valor)}`;
+}
+
+function goToCert() {
+  window.location.href = `certificado.html?id=${courseId}&titulo=${encodeURIComponent(courseTitle)}`;
+}
+
+function formatCard(input) {
+  let v = input.value.replace(/\D/g,'').substring(0,16);
+  input.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function formatExpiry(input) {
+  let v = input.value.replace(/\D/g,'');
+  if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2,4);
+  input.value = v;
+}
+</script>
+</body>
+</html>
