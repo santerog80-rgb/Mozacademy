@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificado - MozAcademy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body style="background:var(--surface-2);">
+
+<!-- Nav -->
+<nav class="nav-public">
+  <a href="index.html" class="topbar-brand">Moz<span>Academy</span></a>
+  <div class="topbar-actions">
+    <a href="dashboard.html" class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,.3);">← Dashboard</a>
+  </div>
+</nav>
+
+<div style="max-width:900px;margin:100px auto 60px;padding:0 20px;">
+
+  <!-- Header -->
+  <div style="text-align:center;margin-bottom:40px;">
+    <div style="display:inline-flex;align-items:center;gap:10px;background:var(--accent-light);border:1px solid rgba(240,165,0,.3);color:var(--accent-hover);padding:8px 20px;border-radius:99px;font-weight:600;font-size:.88rem;margin-bottom:16px;">
+      🏆 Certificado de Conclusão
+    </div>
+    <h2 id="certPageTitle">Carregando certificado...</h2>
+    <p class="text-muted" style="margin-top:8px;">Parabéns pela sua conquista! Baixe ou partilhe o seu certificado.</p>
+  </div>
+
+  <!-- Payment gate -->
+  <div id="paymentGate" class="card hidden" style="text-align:center;padding:48px;">
+    <div style="font-size:3rem;margin-bottom:16px;">🔒</div>
+    <h3 style="margin-bottom:10px;">Certificado não disponível</h3>
+    <p class="text-muted mb-4">Para emitir seu certificado, você precisa concluir o curso e realizar o pagamento.</p>
+    <button class="btn btn-accent btn-lg" id="payGateBtn" onclick="goToPay()">💳 Pagar e Obter Certificado — 350 MT</button>
+  </div>
+
+  <!-- Certificate Preview -->
+  <div id="certContainer">
+    <div class="certificate-preview" id="certPreview">
+      <!-- Decorative elements -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;">
+        <div style="text-align:left;">
+          <div style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;">Certificado Nº</div>
+          <div style="font-size:.85rem;font-weight:700;color:var(--primary);" id="certId">#MOZ-000000</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;">Data de emissão</div>
+          <div style="font-size:.85rem;font-weight:700;color:var(--primary);" id="certDate">--</div>
+        </div>
+      </div>
+
+      <div class="cert-logo">Moz<span>Academy</span></div>
+      <div class="cert-subtitle">Plataforma de Educação Online — Moçambique</div>
+
+      <div class="cert-divider"></div>
+
+      <div class="cert-declares">Certifica que</div>
+      <div class="cert-name" id="certName">Nome do Aluno</div>
+
+      <div class="cert-text">concluiu com êxito e aproveitamento o curso</div>
+      <div class="cert-course" id="certCourse">Nome do Curso</div>
+
+      <div style="display:flex;justify-content:center;gap:60px;margin:30px 0;flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <div style="width:80px;height:2px;background:var(--text-muted);margin:0 auto 8px;"></div>
+          <div style="font-size:.78rem;font-weight:700;color:var(--primary);">Diretor Académico</div>
+          <div style="font-size:.72rem;color:var(--text-muted);">MozAcademy</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:2rem;margin-bottom:4px;">🎓</div>
+          <div style="font-size:.78rem;font-weight:700;color:var(--primary);">MozAcademy</div>
+          <div style="font-size:.72rem;color:var(--text-muted);">Certificado Autêntico</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:80px;height:2px;background:var(--text-muted);margin:0 auto 8px;"></div>
+          <div style="font-size:.78rem;font-weight:700;color:var(--primary);" id="profSign">Professor</div>
+          <div style="font-size:.72rem;color:var(--text-muted);">Instrutor do Curso</div>
+        </div>
+      </div>
+
+      <div class="cert-date" id="certFooterDate"></div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:28px;flex-wrap:wrap;">
+      <button class="btn btn-accent btn-lg" onclick="downloadCert()">
+        ⬇ Baixar Certificado (PDF)
+      </button>
+      <button class="btn btn-primary btn-lg" onclick="shareCert()">
+        🔗 Partilhar
+      </button>
+      <button class="btn btn-outline btn-lg" onclick="window.print()">
+        🖨️ Imprimir
+      </button>
+    </div>
+
+    <!-- Verification -->
+    <div class="card mt-4">
+      <div class="card-body" style="display:flex;align-items:center;gap:16px;">
+        <div style="font-size:2rem;flex-shrink:0;">✅</div>
+        <div>
+          <div style="font-weight:700;margin-bottom:4px;">Certificado Verificável</div>
+          <div class="text-muted text-sm">Este certificado pode ser verificado em <strong>mozacademy.co.mz/verificar</strong> usando o código único acima.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="app.js"></script>
+<script>
+let user, courseId, courseTitle, cert;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const stored = localStorage.getItem('moz_user');
+  if (!stored) { window.location.href = 'login.html'; return; }
+  user = JSON.parse(stored);
+
+  courseId = Utils.getQueryParam('id');
+  courseTitle = decodeURIComponent(Utils.getQueryParam('titulo') || 'Curso');
+
+  document.getElementById('certPageTitle').textContent = `Certificado: ${courseTitle}`;
+  document.getElementById('certCourse').textContent = courseTitle;
+  document.getElementById('certName').textContent = user.nome || 'Aluno';
+  document.getElementById('profSign').textContent = 'Professor';
+
+  // Check if certificate exists
+  cert = await DB.getCertificate(user.id, courseId);
+
+  if (!cert) {
+    // Check if payments approved
+    const payments = await DB.getPayments(user.id);
+    const paid = payments.find(p => p.curso_id == courseId && p.status_pagamento === 'aprovado');
+    if (!paid) {
+      // Show payment gate
+      document.getElementById('certContainer').classList.add('hidden');
+      document.getElementById('paymentGate').classList.remove('hidden');
+      document.getElementById('payGateBtn').onclick = goToPay;
+      return;
+    } else {
+      // Create cert
+      cert = await DB.createCertificate(user.id, courseId);
+    }
+  }
+
+  // Populate cert data
+  const certDate = cert ? new Date(cert.data) : new Date();
+  const dateStr = certDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  const certNum = `#MOZ-${(cert?.id || Date.now()).toString().slice(-6).toUpperCase()}`;
+
+  document.getElementById('certId').textContent = certNum;
+  document.getElementById('certDate').textContent = dateStr;
+  document.getElementById('certFooterDate').textContent = `Emitido em ${dateStr} | MozAcademy — www.mozacademy.co.mz`;
+});
+
+function downloadCert() {
+  CertGen.generate(user.nome || 'Aluno', courseTitle, cert?.data || new Date().toISOString());
+}
+
+function goToPay() {
+  window.location.href = `pagamento.html?id=${courseId}&titulo=${encodeURIComponent(courseTitle)}&tipo=certificado`;
+}
+
+function shareCert() {
+  const url = `${window.location.href}`;
+  if (navigator.share) {
+    navigator.share({
+      title: `Meu Certificado MozAcademy - ${courseTitle}`,
+      text: `Acabei de concluir o curso "${courseTitle}" na MozAcademy! 🎓`,
+      url
+    });
+  } else {
+    navigator.clipboard.writeText(url);
+    App.toast('Link copiado para a área de transferência!', 'success');
+  }
+}
+</script>
+
+<style>
+@media print {
+  nav, button, .card:not(.certificate-preview) { display: none !important; }
+  .certificate-preview { box-shadow: none !important; }
+  body { background: #fff; }
+  div[style*="margin:100px"] { margin: 0 !important; }
+}
+</style>
+</body>
+</html>

@@ -1,0 +1,260 @@
+
+  // Recent payments
+  const tbody = document.getElementById('recentPayments');
+  const recent = adminPayments.slice(0, 5);
+  if (recent.length) {
+    tbody.innerHTML = recent.map(p => {
+      const course = adminCourses.find(c => c.id == p.curso_id);
+      const badge = { aprovado: 'success', pendente: 'warning', rejeitado: 'danger' }[p.status_pagamento] || 'info';
+      return `<tr>
+        <td style="font-size:.82rem;">${p.usuario_id?.slice(0,8) || 'Aluno'}...</td>
+        <td>${p.metodo_pagamento?.toUpperCase() || '-'}</td>
+        <td><span class="badge badge-${badge}">${p.status_pagamento}</span></td>
+        <td>${Utils.formatPrice(p.valor)}</td>
+      </tr>`;
+    }).join('');
+  } else {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px;">Nenhum pagamento.</td></tr>';
+  }
+
+  // Popular courses
+  const sorted = [...adminCourses].sort((a, b) => (b.alunos || 0) - (a.alunos || 0)).slice(0, 4);
+  document.getElementById('popularCourses').innerHTML = sorted.map(c => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="width:44px;height:44px;border-radius:8px;background:var(--surface-3);overflow:hidden;flex-shrink:0;">
+        <img src="${c.imagem || ''}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.titulo}</div>
+        <div style="font-size:.75rem;color:var(--text-muted);">${c.alunos || 0} alunos</div>
+      </div>
+      <div style="font-weight:700;color:var(--accent-hover);font-size:.88rem;">${Utils.formatPrice(c.preco)}</div>
+    </div>
+  `).join('') || '<p class="text-muted text-sm">Nenhum curso.</p>';
+}
+
+function renderCoursesTable(courses) {
+  const tbody = document.getElementById('coursesTableBody');
+  document.getElementById('adminCourseCount').textContent = `${courses.length} cursos`;
+  if (!courses.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px;">Nenhum curso encontrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = courses.map(c => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:40px;height:30px;border-radius:4px;background:var(--surface-3);overflow:hidden;flex-shrink:0;">
+            <img src="${c.imagem || ''}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+          </div>
+          <div style="font-weight:600;font-size:.875rem;">${c.titulo}</div>
+        </div>
+      </td>
+      <td><span class="badge badge-primary">${c.categoria}</span></td>
+      <td style="font-size:.875rem;">${c.professor}</td>
+      <td style="font-weight:700;">${Utils.formatPrice(c.preco)}</td>
+      <td>${c.alunos || 0}</td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-outline btn-sm" onclick="editCourse('${c.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="promptDelete('${c.id}')">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderStudentsTable(users) {
+  const tbody = document.getElementById('studentsTableBody');
+  document.getElementById('totalStudentsBadge').textContent = `${users.length} alunos`;
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px;">Nenhum aluno cadastrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary);font-size:.82rem;">${(u.nome||u.email||'U').charAt(0).toUpperCase()}</div>
+          <span style="font-weight:600;font-size:.875rem;">${u.nome || '-'}</span>
+        </div>
+      </td>
+      <td style="font-size:.82rem;">${u.email}</td>
+      <td><span class="badge ${u.tipo === 'admin' ? 'badge-warning' : 'badge-info'}">${u.tipo}</span></td>
+      <td>-</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="viewStudent('${u.id}')">Ver</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderPaymentsTable(payments) {
+  const tbody = document.getElementById('paymentsTableBody');
+  if (!payments.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:40px;">Nenhum pagamento encontrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = payments.map(p => {
+    const course = adminCourses.find(c => c.id == p.curso_id);
+    const badge = { aprovado: 'success', pendente: 'warning', rejeitado: 'danger' }[p.status_pagamento] || 'info';
+    return `<tr>
+      <td style="font-size:.82rem;">${p.usuario_id?.slice(0,8) || 'Aluno'}...</td>
+      <td style="font-size:.82rem;">${course?.titulo?.substring(0,25) || p.curso_id}</td>
+      <td><span class="badge badge-primary">${p.metodo_pagamento?.toUpperCase() || '-'}</span></td>
+      <td style="font-weight:700;">${Utils.formatPrice(p.valor)}</td>
+      <td style="font-size:.78rem;">${Utils.formatDate(p.data)}</td>
+      <td><span class="badge badge-${badge}">${p.status_pagamento}</span></td>
+      <td>
+        ${p.status_pagamento === 'pendente' ? `
+          <button class="btn btn-success btn-sm" onclick="approvePayment('${p.id}')">✓ Aprovar</button>
+        ` : '-'}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCertsTable() {
+  const tbody = document.getElementById('certsTableBody');
+  if (!adminCerts.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:40px;">Nenhum certificado emitido.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = adminCerts.map(c => {
+    const course = adminCourses.find(co => co.id == c.curso_id);
+    return `<tr>
+      <td style="font-size:.875rem;">${c.usuario_id?.slice(0,8) || 'Aluno'}...</td>
+      <td style="font-size:.875rem;">${course?.titulo || c.curso_id}</td>
+      <td style="font-size:.82rem;">${Utils.formatDate(c.data)}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="App.toast('Verificado!','success')">✓ Verificar</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// Panel navigation
+function showPanel(panel) {
+  document.querySelectorAll('[id^="panel-"]').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+  document.getElementById(`panel-${panel}`)?.classList.remove('hidden');
+  document.getElementById(`nav-${panel}`)?.classList.add('active');
+
+  if (panel === 'cursos') renderCoursesTable(adminCourses);
+  if (panel === 'alunos') renderStudentsTable(adminUsers);
+  if (panel === 'pagamentos') renderPaymentsTable(adminPayments);
+  if (panel === 'certificados') renderCertsTable();
+}
+
+// Course CRUD
+function openCourseModal() {
+  document.getElementById('courseModalTitle').textContent = 'Novo Curso';
+  document.getElementById('courseForm').reset();
+  document.getElementById('courseEditId').value = '';
+  document.getElementById('courseModal').classList.add('open');
+}
+
+function closeCourseModal() {
+  document.getElementById('courseModal').classList.remove('open');
+}
+
+function editCourse(id) {
+  const c = adminCourses.find(c => c.id == id);
+  if (!c) return;
+  document.getElementById('courseModalTitle').textContent = 'Editar Curso';
+  document.getElementById('courseEditId').value = c.id;
+  document.getElementById('cTitulo').value = c.titulo;
+  document.getElementById('cCategoria').value = c.categoria;
+  document.getElementById('cProfessor').value = c.professor;
+  document.getElementById('cPreco').value = c.preco;
+  document.getElementById('cDuracao').value = c.duracao || '';
+  document.getElementById('cNivel').value = c.nivel || 'Iniciante';
+  document.getElementById('cAulas').value = c.aulas || 0;
+  document.getElementById('cDescricao').value = c.descricao || '';
+  document.getElementById('cImagem').value = c.imagem || '';
+  document.getElementById('courseModal').classList.add('open');
+}
+
+async function saveCourse() {
+  const id = document.getElementById('courseEditId').value;
+  const data = {
+    titulo: document.getElementById('cTitulo').value.trim(),
+    categoria: document.getElementById('cCategoria').value,
+    professor: document.getElementById('cProfessor').value.trim(),
+    preco: parseFloat(document.getElementById('cPreco').value) || 0,
+    duracao: document.getElementById('cDuracao').value.trim(),
+    nivel: document.getElementById('cNivel').value,
+    aulas: parseInt(document.getElementById('cAulas').value) || 0,
+    descricao: document.getElementById('cDescricao').value.trim(),
+    imagem: document.getElementById('cImagem').value.trim(),
+  };
+
+  if (!data.titulo || !data.categoria || !data.professor) {
+    App.toast('Preencha todos os campos obrigatórios.', 'warning');
+    return;
+  }
+
+  try {
+    if (id) {
+      await DB.updateCourse(id, data);
+      const idx = adminCourses.findIndex(c => c.id == id);
+      if (idx > -1) adminCourses[idx] = { ...adminCourses[idx], ...data };
+      App.toast('Curso atualizado!', 'success');
+    } else {
+      const created = await DB.createCourse(data);
+      adminCourses.push(created);
+      App.toast('Curso criado com sucesso!', 'success');
+    }
+    closeCourseModal();
+    renderCoursesTable(adminCourses);
+  } catch (err) {
+    App.toast('Erro: ' + err.message, 'error');
+  }
+}
+
+function promptDelete(id) {
+  deleteTarget = id;
+  document.getElementById('deleteModal').classList.add('open');
+}
+function closeDeleteModal() {
+  document.getElementById('deleteModal').classList.remove('open');
+  deleteTarget = null;
+}
+async function confirmDelete() {
+  if (!deleteTarget) return;
+  try {
+    await DB.deleteCourse(deleteTarget);
+    adminCourses = adminCourses.filter(c => c.id != deleteTarget);
+    renderCoursesTable(adminCourses);
+    App.toast('Curso apagado.', 'success');
+    closeDeleteModal();
+  } catch (err) {
+    App.toast('Erro ao apagar: ' + err.message, 'error');
+  }
+}
+
+function filterAdminCourses(q) {
+  const filtered = adminCourses.filter(c =>
+    c.titulo.toLowerCase().includes(q.toLowerCase()) ||
+    c.professor.toLowerCase().includes(q.toLowerCase())
+  );
+  renderCoursesTable(filtered);
+}
+
+function filterPayments(status) {
+  const filtered = status ? adminPayments.filter(p => p.status_pagamento === status) : adminPayments;
+  renderPaymentsTable(filtered);
+}
+
+async function approvePayment(paymentId) {
+  await DB.approvePayment(paymentId);
+  const p = adminPayments.find(p => p.id === paymentId);
+  if (p) p.status_pagamento = 'aprovado';
+  renderPaymentsTable(adminPayments);
+  App.toast('Pagamento aprovado!', 'success');
+}
+
+function viewStudent(id) {
+  App.toast('Funcionalidade em desenvolvimento.', 'info');
+}
+</script>
+</body>
+</html>

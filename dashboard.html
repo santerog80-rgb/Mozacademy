@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - MozAcademy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ── Topbar ── -->
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="menu-toggle">☰</button>
+    <a href="index.html" class="topbar-brand">Moz<span>Academy</span></a>
+  </div>
+  <div style="flex:1;max-width:400px;margin:0 16px;">
+    <div style="display:flex;background:rgba(255,255,255,.1);border-radius:8px;overflow:hidden;">
+      <input id="searchInput" type="text" placeholder="Buscar cursos..." style="flex:1;background:transparent;border:none;outline:none;padding:8px 14px;color:#fff;font-size:.875rem;" oninput="filterCourses(this.value)">
+      <button style="background:none;border:none;color:rgba(255,255,255,.7);padding:0 12px;">🔍</button>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a href="perfil.html" id="topUserInfo" style="display:flex;align-items:center;gap:8px;color:#fff;padding:4px 8px;border-radius:8px;transition:var(--transition);">
+      <div id="topAvatar" style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary);font-size:.85rem;">U</div>
+      <span id="topUserName" style="font-size:.88rem;font-weight:500;">Aluno</span>
+    </a>
+    <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.8);" data-action="logout">Sair</button>
+  </div>
+</header>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar" id="sidebar">
+  <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;">
+    <div id="sidebarAvatar" style="width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary);font-size:1.1rem;margin-bottom:10px;">U</div>
+    <div style="color:#fff;font-weight:600;font-size:.92rem;" data-user-name>Carregando...</div>
+    <div style="color:rgba(255,255,255,.45);font-size:.75rem;" data-user-email></div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Principal</div>
+    <a href="dashboard.html" class="sidebar-link active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="#" onclick="showTab('meus-cursos')" class="sidebar-link" id="tabMeusCursos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Meus Cursos
+    </a>
+    <a href="index.html" class="sidebar-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Explorar Cursos
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Minha Conta</div>
+    <a href="perfil.html" class="sidebar-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Perfil
+    </a>
+    <a href="#" onclick="showTab('certificados')" class="sidebar-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+      Certificados
+    </a>
+    <a href="#" onclick="showTab('pagamentos')" class="sidebar-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Pagamentos
+    </a>
+  </div>
+
+  <div class="sidebar-section" style="margin-top:auto; padding-top:20px;">
+    <button class="sidebar-link" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);" data-action="logout">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair da conta
+    </button>
+  </div>
+</aside>
+
+<!-- ── Main Content ── -->
+<main class="main-content">
+
+  <!-- Welcome Banner -->
+  <div id="welcomeBanner" style="background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:var(--radius);padding:28px 32px;color:#fff;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+    <div>
+      <h2 style="color:#fff;margin-bottom:4px;">Olá, <span data-user-name>Aluno</span>! 👋</h2>
+      <p style="color:rgba(255,255,255,.7);font-size:.9rem;">Pronto para continuar aprendendo? Você tem <strong id="enrolledCount" style="color:var(--accent);">0</strong> curso(s) em andamento.</p>
+    </div>
+    <a href="index.html" class="btn btn-accent">Explorar Novos Cursos</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid-stats mb-6">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(59,130,246,.12);">📚</div>
+      <div class="stat-value" id="statCursos">0</div>
+      <div class="stat-label">Cursos Inscritos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(34,197,94,.12);">✅</div>
+      <div class="stat-value" id="statAulas">0</div>
+      <div class="stat-label">Aulas Concluídas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(240,165,0,.12);">🏆</div>
+      <div class="stat-value" id="statCerts">0</div>
+      <div class="stat-label">Certificados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(239,68,68,.12);">⏱️</div>
+      <div class="stat-value" id="statHoras">0h</div>
+      <div class="stat-label">Horas de Estudo</div>
+    </div>
+  </div>
+
+  <!-- Tabs content -->
+  <div id="tab-all" class="tab-panel">
+    <div class="section-header mb-4" style="padding:0;">
+      <h3>Todos os Cursos Disponíveis</h3>
+    </div>
+    <div class="grid-courses" id="allCoursesGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;">
+        <div class="spinner" style="margin:0 auto 16px;"></div>
+        <p class="text-muted">Carregando...</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-meus-cursos" class="tab-panel hidden">
+    <div class="section-header mb-4" style="padding:0;">
+      <h3>Meus Cursos</h3>
+    </div>
+    <div class="grid-courses" id="myCoursesGrid">
+      <div style="grid-column:1/-1;" class="empty-state">
+        <div style="font-size:3rem;margin-bottom:16px;">📚</div>
+        <h3>Sem cursos ainda</h3>
+        <p>Explore nosso catálogo e inscreva-se no seu primeiro curso!</p>
+        <a href="index.html" class="btn btn-accent mt-4">Ver Cursos</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-certificados" class="tab-panel hidden">
+    <div class="section-header mb-4" style="padding:0;">
+      <h3>Meus Certificados</h3>
+    </div>
+    <div id="certsGrid">
+      <div class="empty-state">
+        <div style="font-size:3rem;margin-bottom:16px;">🏆</div>
+        <h3>Nenhum certificado ainda</h3>
+        <p>Conclua um curso e pague o certificado para obtê-lo.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-pagamentos" class="tab-panel hidden">
+    <div class="section-header mb-4" style="padding:0;">
+      <h3>Histórico de Pagamentos</h3>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Curso</th>
+              <th>Método</th>
+              <th>Valor</th>
+              <th>Data</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="paymentsTbody">
+            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px;">Nenhum pagamento encontrado.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+let user, enrolledCourses = [], allCourses = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // Get user
+  const stored = localStorage.getItem('moz_user');
+  if (!stored) { window.location.href = 'login.html'; return; }
+  user = JSON.parse(stored);
+  App.currentUser = user;
+
+  // Update UI
+  const name = user.nome || user.email;
+  const initials = name.charAt(0).toUpperCase();
+  document.querySelectorAll('[data-user-name]').forEach(el => el.textContent = name);
+  document.querySelectorAll('[data-user-email]').forEach(el => el.textContent = user.email || '');
+  document.querySelectorAll('#topAvatar, #sidebarAvatar').forEach(el => { el.textContent = initials; });
+  document.getElementById('topUserName').textContent = name.split(' ')[0];
+
+  // Load data
+  await loadDashboard();
+});
+
+async function loadDashboard() {
+  allCourses = await DB.getCourses();
+  enrolledCourses = await DB.getUserEnrollments(user.id);
+
+  // Update stats
+  document.getElementById('statCursos').textContent = enrolledCourses.length;
+  document.getElementById('enrolledCount').textContent = enrolledCourses.length;
+
+  // Count completed lessons
+  let totalDone = 0;
+  for (const c of enrolledCourses) {
+    const prog = await DB.getProgress(user.id, c.id);
+    totalDone += (Array.isArray(prog) ? prog.length : prog.filter(p => p.concluido).length);
+  }
+  document.getElementById('statAulas').textContent = totalDone;
+  document.getElementById('statHoras').textContent = (totalDone * 0.4).toFixed(0) + 'h';
+
+  // Certs
+  const certs = JSON.parse(localStorage.getItem('moz_certs') || '[]').filter(c => c.usuario_id === user.id);
+  document.getElementById('statCerts').textContent = certs.length;
+
+  // Render grids
+  renderAllCourses();
+  renderMyCourses();
+  renderCerts(certs);
+  await renderPayments();
+}
+
+function renderAllCourses() {
+  const grid = document.getElementById('allCoursesGrid');
+  if (!allCourses.length) { grid.innerHTML = '<div style="grid-column:1/-1;" class="empty-state"><p>Nenhum curso disponível.</p></div>'; return; }
+  grid.innerHTML = allCourses.map(c => {
+    const enrolled = enrolledCourses.some(e => e.id == c.id);
+    return `
+      <div class="course-card">
+        <div class="course-card-thumb">
+          <img src="${c.imagem || 'https://via.placeholder.com/400x220/1a2744/f0a500?text=Curso'}" alt="${c.titulo}" loading="lazy">
+          ${enrolled ? '<span class="course-card-badge" style="background:var(--success);">Inscrito</span>' : `<span class="course-card-badge">${c.nivel || 'Todos'}</span>`}
+        </div>
+        <div class="course-card-body">
+          <div class="course-card-category">${c.categoria}</div>
+          <h3 class="course-card-title">${c.titulo}</h3>
+          <div class="course-card-meta">
+            <span>👤 ${c.professor}</span>
+            <span>🕐 ${c.duracao}</span>
+          </div>
+          <div class="course-card-footer">
+            <div class="course-price ${c.preco === 0 ? 'free' : ''}">${Utils.formatPrice(c.preco)}</div>
+            ${enrolled
+              ? `<button class="btn btn-success btn-sm" onclick="goToCourse('${c.id}')">Continuar</button>`
+              : `<button class="btn btn-accent btn-sm" onclick="enrollCourse('${c.id}', '${c.titulo}', ${c.preco})">Inscrever-se</button>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderMyCourses() {
+  const grid = document.getElementById('myCoursesGrid');
+  if (!enrolledCourses.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;" class="empty-state">
+      <div style="font-size:3rem;margin-bottom:16px;">📚</div>
+      <h3>Sem cursos ainda</h3>
+      <p>Explore e inscreva-se no seu primeiro curso!</p>
+      <a href="index.html" class="btn btn-accent mt-4">Ver Cursos</a>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = enrolledCourses.map(c => `
+    <div class="course-card">
+      <div class="course-card-thumb">
+        <img src="${c.imagem || 'https://via.placeholder.com/400x220/1a2744/f0a500?text=Curso'}" alt="${c.titulo}" loading="lazy">
+        <span class="course-card-badge" style="background:var(--success);">Inscrito</span>
+      </div>
+      <div class="course-card-body">
+        <div class="course-card-category">${c.categoria}</div>
+        <h3 class="course-card-title">${c.titulo}</h3>
+        <div class="course-card-meta">
+          <span>👤 ${c.professor}</span>
+          <span>📹 ${c.aulas} aulas</span>
+        </div>
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--text-muted);margin-bottom:6px;">
+            <span>Progresso</span>
+            <span id="prog-${c.id}">Calculando...</span>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar" id="bar-${c.id}" style="width:0%"></div></div>
+        </div>
+        <div class="course-card-footer">
+          <button class="btn btn-primary btn-sm flex-1" onclick="goToCourse('${c.id}')">▶ Continuar</button>
+          <button class="btn btn-outline btn-sm" onclick="goPay('${c.id}','${c.titulo}')">🏆 Certificado</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Load progress for each
+  enrolledCourses.forEach(async c => {
+    const lessons = await DB.getLessons(c.id);
+    const progress = await DB.getProgress(user.id, c.id);
+    const done = Array.isArray(progress) ? progress.length : progress.filter(p => p.concluido).length;
+    const total = lessons.length || 1;
+    const pct = Math.round((done / total) * 100);
+    const bar = document.getElementById(`bar-${c.id}`);
+    const label = document.getElementById(`prog-${c.id}`);
+    if (bar) bar.style.width = pct + '%';
+    if (label) label.textContent = `${pct}% (${done}/${total})`;
+  });
+}
+
+function renderCerts(certs) {
+  const grid = document.getElementById('certsGrid');
+  if (!certs.length) return;
+  grid.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">` +
+    certs.map(cert => {
+      const course = allCourses.find(c => c.id == cert.curso_id);
+      return `
+        <div class="card">
+          <div class="card-body" style="text-align:center;">
+            <div style="font-size:3rem;margin-bottom:12px;">🏆</div>
+            <h4 style="margin-bottom:6px;">${course?.titulo || 'Curso'}</h4>
+            <p class="text-muted text-sm mb-4">${Utils.formatDate(cert.data)}</p>
+            <button class="btn btn-accent btn-block" onclick="downloadCert('${cert.id}','${course?.titulo}')">
+              📄 Baixar Certificado
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('') + '</div>';
+}
+
+async function renderPayments() {
+  const payments = await DB.getPayments(user.id);
+  const tbody = document.getElementById('paymentsTbody');
+  if (!payments.length) return;
+  const statusBadge = (s) => {
+    const map = { aprovado: 'success', pendente: 'warning', rejeitado: 'danger' };
+    return `<span class="badge badge-${map[s] || 'info'}">${s}</span>`;
+  };
+  tbody.innerHTML = payments.map(p => {
+    const course = allCourses.find(c => c.id == p.curso_id);
+    return `<tr>
+      <td>${course?.titulo || p.curso_id}</td>
+      <td>${p.metodo_pagamento?.toUpperCase() || '-'}</td>
+      <td>${Utils.formatPrice(p.valor)}</td>
+      <td>${Utils.formatDate(p.data)}</td>
+      <td>${statusBadge(p.status_pagamento)}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function enrollCourse(courseId, courseTitle, preco) {
+  if (preco > 0) {
+    window.location.href = `pagamento.html?id=${courseId}&titulo=${encodeURIComponent(courseTitle)}&valor=${preco}`;
+    return;
+  }
+  try {
+    await DB.enroll(user.id, courseId);
+    App.toast(`Inscrito em "${courseTitle}"!`, 'success');
+    await loadDashboard();
+  } catch (err) {
+    App.toast('Erro ao inscrever. Tente novamente.', 'error');
+  }
+}
+
+function goToCourse(id) {
+  window.location.href = `curso.html?id=${id}`;
+}
+
+function goPay(courseId, courseTitle) {
+  window.location.href = `pagamento.html?id=${courseId}&titulo=${encodeURIComponent(courseTitle)}&tipo=certificado`;
+}
+
+function filterCourses(q) {
+  const grid = document.getElementById('allCoursesGrid');
+  const filtered = allCourses.filter(c =>
+    c.titulo.toLowerCase().includes(q.toLowerCase()) ||
+    c.professor.toLowerCase().includes(q.toLowerCase())
+  );
+  // Re-render subset
+}
+
+function downloadCert(certId, courseTitle) {
+  CertGen.generate(user.nome, courseTitle, new Date().toISOString());
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
+  document.getElementById(`tab-${tab}`)?.classList.remove('hidden');
+  // Also handle 'all'
+  if (tab === 'all') document.getElementById('tab-all').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
