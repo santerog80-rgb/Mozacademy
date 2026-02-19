@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MozAcademy - Aprenda com os Melhores</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav class="nav-public">
+  <a href="index.html" class="topbar-brand">Moz<span>Academy</span></a>
+  <div class="nav-links">
+    <a href="#categorias">Categorias</a>
+    <a href="#cursos">Cursos</a>
+    <a href="#sobre">Sobre</a>
+  </div>
+  <div style="flex:1; max-width:400px; margin: 0 16px;">
+    <div class="search-bar" style="margin:0;">
+      <input type="text" id="heroSearch" placeholder="Buscar cursos..." style="padding:10px 16px; font-size:.85rem;">
+      <button onclick="doSearch()" style="padding:10px 18px;">🔍</button>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="menu-toggle">${Icons?.menu || '☰'}</button>
+    <div id="navAuth">
+      <a href="login.html">Entrar</a>
+      <a href="cadastro.html" class="btn btn-accent btn-sm">Cadastrar</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero" style="padding-top:84px;">
+  <div class="hero-content">
+    <div class="hero-badge">🇲🇿 Plataforma líder em Moçambique</div>
+    <h1>Aprenda.<em>Cresça.</em><br>Conquiste seu futuro.</h1>
+    <p>Acesse centenas de cursos online com os melhores professores de Moçambique e do mundo. Do básico ao avançado, aprenda no seu ritmo.</p>
+    <div class="hero-actions">
+      <a href="cadastro.html" class="btn btn-accent btn-lg">Começar Gratuitamente</a>
+      <a href="#cursos" class="btn btn-lg" style="background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.3);">Ver Todos os Cursos</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-value">10K+</div>
+        <div class="hero-stat-label">Alunos Ativos</div>
+      </div>
+      <div>
+        <div class="hero-stat-value">200+</div>
+        <div class="hero-stat-label">Cursos Disponíveis</div>
+      </div>
+      <div>
+        <div class="hero-stat-value">50+</div>
+        <div class="hero-stat-label">Professores Especialistas</div>
+      </div>
+      <div>
+        <div class="hero-stat-value">98%</div>
+        <div class="hero-stat-label">Satisfação dos Alunos</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Categorias ── -->
+<section class="section" id="categorias">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">Explore por Categoria</h2>
+      <p class="section-subtitle">Encontre o curso perfeito para você</p>
+    </div>
+  </div>
+  <div class="categories-grid" id="categoriesGrid">
+    <div class="cat-card active" onclick="filterCategory('')">
+      <div class="cat-icon">📚</div>
+      <div class="cat-name">Todos</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Tecnologia')">
+      <div class="cat-icon">💻</div>
+      <div class="cat-name">Tecnologia</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Negócios')">
+      <div class="cat-icon">💼</div>
+      <div class="cat-name">Negócios</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Marketing')">
+      <div class="cat-icon">📢</div>
+      <div class="cat-name">Marketing</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Design')">
+      <div class="cat-icon">🎨</div>
+      <div class="cat-name">Design</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Idiomas')">
+      <div class="cat-icon">🌍</div>
+      <div class="cat-name">Idiomas</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Saúde')">
+      <div class="cat-icon">🏥</div>
+      <div class="cat-name">Saúde</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Finanças')">
+      <div class="cat-icon">📊</div>
+      <div class="cat-name">Finanças</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Cursos ── -->
+<section class="section" id="cursos" style="background:var(--surface-2); max-width:100%; padding:60px 40px;">
+  <div style="max-width:1300px; margin:0 auto;">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Cursos em Destaque</h2>
+        <p class="section-subtitle" id="courseCount">Carregando cursos...</p>
+      </div>
+      <div class="flex gap-3 items-center">
+        <select id="sortSelect" class="form-control" style="width:auto;" onchange="sortCourses()">
+          <option value="">Ordenar por</option>
+          <option value="preco_asc">Menor Preço</option>
+          <option value="preco_desc">Maior Preço</option>
+          <option value="alunos">Mais Populares</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-courses" id="coursesGrid">
+      <!-- Courses will be injected here -->
+      <div style="grid-column:1/-1; text-align:center; padding:40px;">
+        <div class="spinner" style="margin:0 auto 16px;"></div>
+        <p class="text-muted">Carregando cursos...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Por que MozAcademy ── -->
+<section class="section" id="sobre">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">Por que escolher a MozAcademy?</h2>
+      <p class="section-subtitle">Vantagens exclusivas para o seu aprendizado</p>
+    </div>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:24px;">
+    <div class="card">
+      <div class="card-body" style="text-align:center;">
+        <div style="font-size:2.5rem; margin-bottom:16px;">🎓</div>
+        <h4 style="margin-bottom:8px;">Certificados Reconhecidos</h4>
+        <p class="text-muted text-sm">Certificados em PDF gerados automaticamente ao concluir os cursos.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="text-align:center;">
+        <div style="font-size:2.5rem; margin-bottom:16px;">📱</div>
+        <h4 style="margin-bottom:8px;">Aprenda em Qualquer Lugar</h4>
+        <p class="text-muted text-sm">Plataforma 100% responsiva. Estude do celular, tablet ou computador.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="text-align:center;">
+        <div style="font-size:2.5rem; margin-bottom:16px;">💳</div>
+        <h4 style="margin-bottom:8px;">Pagamento Fácil</h4>
+        <p class="text-muted text-sm">M-Pesa, E-Mola, mKesh e cartões bancários aceitos.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="text-align:center;">
+        <div style="font-size:2.5rem; margin-bottom:16px;">👨‍🏫</div>
+        <h4 style="margin-bottom:8px;">Professores Especialistas</h4>
+        <p class="text-muted text-sm">Aprenda com profissionais experientes e reconhecidos no mercado.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Depoimentos ── -->
+<section style="background:var(--primary); padding:80px 40px;">
+  <div style="max-width:900px; margin:0 auto; text-align:center;">
+    <h2 style="color:#fff; margin-bottom:8px;">O que nossos alunos dizem</h2>
+    <p style="color:rgba(255,255,255,.6); margin-bottom:48px;">Histórias reais de transformação</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:24px;">
+      <div style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius); padding:28px; text-align:left;">
+        <div style="color:var(--accent); font-size:1.2rem; margin-bottom:14px;">★★★★★</div>
+        <p style="color:rgba(255,255,255,.8); font-size:.9rem; line-height:1.7; margin-bottom:18px;">"A MozAcademy mudou minha carreira! Aprendi desenvolvimento web em 3 meses e já tenho clientes."</p>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary);">A</div>
+          <div><div style="color:#fff;font-weight:600;font-size:.88rem;">Alberto Mate</div><div style="color:rgba(255,255,255,.5);font-size:.78rem;">Maputo</div></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius); padding:28px; text-align:left;">
+        <div style="color:var(--accent); font-size:1.2rem; margin-bottom:14px;">★★★★★</div>
+        <p style="color:rgba(255,255,255,.8); font-size:.9rem; line-height:1.7; margin-bottom:18px;">"Excelente plataforma! Os vídeos são de alta qualidade e os professores são muito didáticos."</p>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary);">L</div>
+          <div><div style="color:#fff;font-weight:600;font-size:.88rem;">Lurdes Matos</div><div style="color:rgba(255,255,255,.5);font-size:.78rem;">Beira</div></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius); padding:28px; text-align:left;">
+        <div style="color:var(--accent); font-size:1.2rem; margin-bottom:14px;">★★★★★</div>
+        <p style="color:rgba(255,255,255,.8); font-size:.9rem; line-height:1.7; margin-bottom:18px;">"O suporte é incrível e os certificados são reconhecidos. Recomendo a todos!"</p>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary);">S</div>
+          <div><div style="color:#fff;font-weight:600;font-size:.88rem;">Sérgio Chilaule</div><div style="color:rgba(255,255,255,.5);font-size:.78rem;">Nampula</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section style="padding:80px 40px; text-align:center;">
+  <div style="max-width:600px; margin:0 auto;">
+    <h2>Pronto para começar?</h2>
+    <p class="text-muted" style="margin:16px 0 32px; font-size:1.05rem;">Cadastre-se gratuitamente e acesse cursos premium com os melhores professores.</p>
+    <a href="cadastro.html" class="btn btn-accent btn-lg">Criar Minha Conta Grátis</a>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer class="public-footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">Moz<span>Academy</span></div>
+      <p class="footer-desc">A plataforma de educação online líder em Moçambique. Aprenda com os melhores e transforme sua carreira.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Plataforma</h5>
+      <ul>
+        <li><a href="index.html">Início</a></li>
+        <li><a href="#cursos">Cursos</a></li>
+        <li><a href="cadastro.html">Cadastro</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Empresa</h5>
+      <ul>
+        <li><a href="#">Sobre nós</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Carreiras</a></li>
+        <li><a href="#">Parcerias</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Suporte</h5>
+      <ul>
+        <li><a href="#">Central de Ajuda</a></li>
+        <li><a href="#">Termos de Uso</a></li>
+        <li><a href="#">Privacidade</a></li>
+        <li><a href="mailto:info@mozacademy.co.mz">Contacto</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    © 2024 MozAcademy. Todos os direitos reservados. 🇲🇿 Feito com orgulho em Moçambique.
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+let allCourses = [];
+let currentCategory = '';
+
+// Update nav for logged-in user
+document.addEventListener('DOMContentLoaded', async () => {
+  // Check if user is logged in
+  setTimeout(() => {
+    const user = App.currentUser;
+    if (user) {
+      document.getElementById('navAuth').innerHTML = `
+        <a href="dashboard.html" class="btn btn-accent btn-sm">Meu Dashboard</a>
+      `;
+    }
+  }, 600);
+
+  // Load courses
+  allCourses = await DB.getCourses();
+  renderCourses(allCourses);
+});
+
+function renderCourses(courses) {
+  const grid = document.getElementById('coursesGrid');
+  const count = document.getElementById('courseCount');
+
+  if (!courses.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;" class="empty-state">
+      <p>Nenhum curso encontrado.</p>
+    </div>`;
+    count.textContent = '0 cursos encontrados';
+    return;
+  }
+
+  count.textContent = `${courses.length} curso${courses.length !== 1 ? 's' : ''} disponível${courses.length !== 1 ? 'is' : ''}`;
+  grid.innerHTML = courses.map(c => courseCardHTML(c)).join('');
+}
+
+function courseCardHTML(c) {
+  const stars = '★'.repeat(Math.round(c.avaliacao || 4.5)) + '☆'.repeat(5 - Math.round(c.avaliacao || 4.5));
+  return `
+    <div class="course-card" onclick="window.location.href='curso.html?id=${c.id}'">
+      <div class="course-card-thumb">
+        <img src="${c.imagem || 'https://via.placeholder.com/400x220/1a2744/f0a500?text=Curso'}" alt="${c.titulo}" loading="lazy">
+        <span class="course-card-badge">${c.nivel || 'Todos'}</span>
+      </div>
+      <div class="course-card-body">
+        <div class="course-card-category">${c.categoria}</div>
+        <h3 class="course-card-title">${c.titulo}</h3>
+        <div class="course-card-meta">
+          <span>👤 ${c.professor}</span>
+          <span>🕐 ${c.duracao}</span>
+          <span>📹 ${c.aulas} aulas</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <span style="color:var(--accent);font-size:.85rem;">${stars}</span>
+          <span style="font-size:.78rem;color:var(--text-muted);">(${c.alunos || 0})</span>
+        </div>
+        <div class="course-card-footer">
+          <div class="course-price ${c.preco === 0 ? 'free' : ''}">${Utils.formatPrice(c.preco)}</div>
+          <button class="btn btn-accent btn-sm" onclick="event.stopPropagation();window.location.href='curso.html?id=${c.id}'">Ver Curso</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function filterCategory(cat) {
+  currentCategory = cat;
+  document.querySelectorAll('.cat-card').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const filtered = await DB.getCourses({ categoria: cat || undefined });
+  renderCourses(filtered);
+}
+
+function doSearch() {
+  const q = document.getElementById('heroSearch').value.trim();
+  const filtered = allCourses.filter(c =>
+    c.titulo.toLowerCase().includes(q.toLowerCase()) ||
+    c.professor.toLowerCase().includes(q.toLowerCase()) ||
+    c.categoria.toLowerCase().includes(q.toLowerCase())
+  );
+  renderCourses(filtered);
+  document.getElementById('cursos').scrollIntoView({ behavior: 'smooth' });
+}
+
+document.getElementById('heroSearch').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+function sortCourses() {
+  const val = document.getElementById('sortSelect').value;
+  const sorted = [...allCourses];
+  if (val === 'preco_asc') sorted.sort((a, b) => a.preco - b.preco);
+  else if (val === 'preco_desc') sorted.sort((a, b) => b.preco - a.preco);
+  else if (val === 'alunos') sorted.sort((a, b) => (b.alunos || 0) - (a.alunos || 0));
+  renderCourses(sorted);
+}
+</script>
+</body>
+</html>
