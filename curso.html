@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curso - MozAcademy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav-public">
+  <a href="index.html" class="topbar-brand">Moz<span>Academy</span></a>
+  <div class="nav-links">
+    <a href="index.html">← Voltar aos Cursos</a>
+  </div>
+  <div class="topbar-actions">
+    <div id="navAuth">
+      <a href="login.html">Entrar</a>
+      <a href="cadastro.html" class="btn btn-accent btn-sm">Cadastrar</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Course Hero -->
+<section id="courseHero" style="background:var(--primary);padding-top:84px;">
+  <div style="max-width:1200px;margin:0 auto;padding:40px;display:grid;grid-template-columns:1fr 380px;gap:40px;align-items:start;">
+    <div>
+      <div id="courseCategory" class="badge badge-accent mb-4" style="font-size:.8rem;">Categoria</div>
+      <h1 id="courseTitle" style="color:#fff;font-size:2rem;margin-bottom:16px;">Carregando...</h1>
+      <p id="courseDesc" style="color:rgba(255,255,255,.75);font-size:.95rem;line-height:1.8;margin-bottom:20px;"></p>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;color:rgba(255,255,255,.7);font-size:.875rem;margin-bottom:20px;">
+        <span>👤 <strong id="courseProfessor" style="color:#fff;"></strong></span>
+        <span>🕐 <span id="courseDuration"></span></span>
+        <span>📹 <span id="courseAulas"></span> aulas</span>
+        <span>👥 <span id="courseAlunos"></span> alunos</span>
+        <span>⭐ <span id="courseRating"></span></span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="courseTags"></div>
+    </div>
+
+    <!-- Course Card -->
+    <div class="card" style="position:sticky;top:84px;">
+      <div style="background:var(--surface-3);aspect-ratio:16/9;overflow:hidden;">
+        <img id="courseThumb" src="" alt="" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="card-body">
+        <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;margin-bottom:4px;" id="coursePrice"></div>
+        <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:18px;">Acesso vitalício · Certificado incluso</p>
+        <button class="btn btn-accent btn-block btn-lg mb-3" id="enrollBtn" onclick="handleEnroll()">
+          Inscrever-se Agora
+        </button>
+        <button class="btn btn-outline btn-block mb-4" onclick="previewLesson()">
+          ▶ Assistir Aula Grátis
+        </button>
+        <div style="font-size:.8rem;color:var(--text-muted);">
+          <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>🔄 Acesso vitalício</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>📱 Acesso mobile</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>🏆 Certificado de conclusão</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>📄 Materiais para download</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Course Content -->
+<div style="max-width:1200px;margin:0 auto;padding:40px;display:grid;grid-template-columns:1fr 380px;gap:40px;">
+  <div>
+    <!-- Tabs -->
+    <div class="tabs" style="margin-bottom:28px;">
+      <div class="tab active" onclick="switchTab(this,'content')">Conteúdo</div>
+      <div class="tab" onclick="switchTab(this,'about')">Sobre o Curso</div>
+      <div class="tab" onclick="switchTab(this,'professor')">Professor</div>
+    </div>
+
+    <!-- Content Tab -->
+    <div id="tab-content">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3>Conteúdo do Curso</h3>
+        <span class="text-muted text-sm" id="lessonSummary">0 aulas</span>
+      </div>
+      <div id="lessonList" class="lesson-list">
+        <div style="text-align:center;padding:40px;">
+          <div class="spinner" style="margin:0 auto;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- About Tab -->
+    <div id="tab-about" class="hidden">
+      <h3 style="margin-bottom:16px;">Sobre este Curso</h3>
+      <p class="text-muted" id="aboutDesc" style="line-height:1.8;margin-bottom:24px;"></p>
+      <h4 style="margin-bottom:12px;">O que você vai aprender</h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="learningPoints">
+        <div style="display:flex;gap:8px;font-size:.88rem;"><span style="color:var(--success);">✓</span> Fundamentos sólidos</div>
+        <div style="display:flex;gap:8px;font-size:.88rem;"><span style="color:var(--success);">✓</span> Projetos práticos</div>
+        <div style="display:flex;gap:8px;font-size:.88rem;"><span style="color:var(--success);">✓</span> Certificado reconhecido</div>
+        <div style="display:flex;gap:8px;font-size:.88rem;"><span style="color:var(--success);">✓</span> Suporte do professor</div>
+        <div style="display:flex;gap:8px;font-size:.88rem;"><span style="color:var(--success);">✓</span> Material complementar</div>
+        <div style="display:flex;gap:8px;font-size:.88helm;"><span style="color:var(--success);">✓</span> Acesso vitalício</div>
+      </div>
+    </div>
+
+    <!-- Professor Tab -->
+    <div id="tab-professor" class="hidden">
+      <h3 style="margin-bottom:20px;">Sobre o Professor</h3>
+      <div style="display:flex;gap:20px;align-items:flex-start;">
+        <div style="width:80px;height:80px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;color:var(--primary);flex-shrink:0;" id="profAvatar">P</div>
+        <div>
+          <h4 id="profName" style="margin-bottom:4px;"></h4>
+          <p style="color:var(--text-secondary);font-size:.875rem;margin-bottom:12px;">Especialista e Instrutor Certificado</p>
+          <p class="text-muted text-sm" style="line-height:1.7;">Professor experiente com anos de atuação no mercado. Comprometido em oferecer a melhor experiência de aprendizado aos seus alunos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right sidebar (desktop only) -->
+  <div style="padding-top:60px;">
+    <div class="card">
+      <div class="card-body">
+        <h4 style="margin-bottom:12px;">Requisitos</h4>
+        <ul style="display:flex;flex-direction:column;gap:8px;font-size:.875rem;color:var(--text-secondary);">
+          <li>• Computador com conexão à internet</li>
+          <li>• Vontade de aprender</li>
+          <li>• Conhecimentos básicos recomendados</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+let course, lessons, user, enrolled = false;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const id = Utils.getQueryParam('id');
+  if (!id) { window.location.href = 'index.html'; return; }
+
+  user = JSON.parse(localStorage.getItem('moz_user') || 'null');
+  if (user) {
+    document.getElementById('navAuth').innerHTML = `<a href="dashboard.html" class="btn btn-accent btn-sm">Dashboard</a>`;
+    enrolled = await DB.isEnrolled(user.id, id);
+  }
+
+  course = await DB.getCourse(id);
+  if (!course) { window.location.href = 'index.html'; return; }
+
+  lessons = await DB.getLessons(id);
+  renderCourse();
+  renderLessons();
+  updateEnrollBtn();
+});
+
+function renderCourse() {
+  document.title = course.titulo + ' - MozAcademy';
+  document.getElementById('courseTitle').textContent = course.titulo;
+  document.getElementById('courseCategory').textContent = course.categoria;
+  document.getElementById('courseDesc').textContent = course.descricao;
+  document.getElementById('courseProfessor').textContent = course.professor;
+  document.getElementById('courseDuration').textContent = course.duracao;
+  document.getElementById('courseAulas').textContent = course.aulas || lessons.length;
+  document.getElementById('courseAlunos').textContent = (course.alunos || 0).toLocaleString();
+  document.getElementById('courseRating').textContent = (course.avaliacao || 4.5) + '/5';
+  document.getElementById('coursePrice').textContent = Utils.formatPrice(course.preco);
+  document.getElementById('courseThumb').src = course.imagem || 'https://via.placeholder.com/600x340/1a2744/f0a500?text=' + encodeURIComponent(course.titulo);
+  document.getElementById('aboutDesc').textContent = course.descricao;
+  const prof = document.getElementById('profName');
+  const profAvatar = document.getElementById('profAvatar');
+  if (prof) { prof.textContent = course.professor; profAvatar.textContent = course.professor?.charAt(0) || 'P'; }
+}
+
+function renderLessons() {
+  const container = document.getElementById('lessonList');
+  document.getElementById('lessonSummary').textContent = `${lessons.length} aulas`;
+
+  if (!lessons.length) {
+    container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);">Nenhuma aula disponível.</div>';
+    return;
+  }
+
+  // Group by chapter
+  const chapters = {};
+  lessons.forEach(l => {
+    const ch = l.capitulo || 'Módulo 1';
+    if (!chapters[ch]) chapters[ch] = [];
+    chapters[ch].push(l);
+  });
+
+  container.innerHTML = Object.entries(chapters).map(([ch, aulas]) => `
+    <div class="lesson-chapter">
+      <div class="lesson-chapter-header">
+        <span>${ch}</span>
+        <span style="font-size:.78rem;color:var(--text-muted);">${aulas.length} aulas</span>
+      </div>
+      ${aulas.map((a, i) => `
+        <div class="lesson-item" onclick="goToLesson('${course.id}', '${a.id}')">
+          <div class="lesson-check">${enrolled ? '' : '🔒'}</div>
+          <div style="flex:1;">
+            <div style="font-size:.875rem;">${a.titulo}</div>
+            ${a.pdf_url ? '<div style="font-size:.72rem;color:var(--text-muted);">📄 + PDF</div>' : ''}
+          </div>
+          <span class="lesson-duration">${a.duracao || '~15min'}</span>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function updateEnrollBtn() {
+  const btn = document.getElementById('enrollBtn');
+  if (!btn) return;
+  if (enrolled) {
+    btn.textContent = '▶ Continuar Curso';
+    btn.className = 'btn btn-success btn-block btn-lg mb-3';
+    btn.onclick = () => window.location.href = `assistir.html?id=${course.id}`;
+  }
+}
+
+async function handleEnroll() {
+  if (!user) { window.location.href = `login.html?redirect=curso.html?id=${course.id}`; return; }
+  if (enrolled) { window.location.href = `assistir.html?id=${course.id}`; return; }
+  if (course.preco > 0) {
+    window.location.href = `pagamento.html?id=${course.id}&titulo=${encodeURIComponent(course.titulo)}&valor=${course.preco}`;
+  } else {
+    await DB.enroll(user.id, course.id);
+    enrolled = true;
+    updateEnrollBtn();
+    App.toast('Inscrito com sucesso! Bom estudo!', 'success');
+  }
+}
+
+function previewLesson() {
+  if (lessons.length) goToLesson(course.id, lessons[0].id);
+}
+
+function goToLesson(courseId, lessonId) {
+  if (!user) { window.location.href = `login.html`; return; }
+  if (!enrolled) { handleEnroll(); return; }
+  window.location.href = `assistir.html?id=${courseId}&aula=${lessonId}`;
+}
+
+function switchTab(el, tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['content','about','professor'].forEach(t => {
+    document.getElementById(`tab-${t}`)?.classList.toggle('hidden', t !== tab);
+  });
+}
+</script>
+</body>
+</html>

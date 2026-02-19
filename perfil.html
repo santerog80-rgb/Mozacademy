@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil - MozAcademy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Topbar -->
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="menu-toggle">☰</button>
+    <a href="index.html" class="topbar-brand">Moz<span>Academy</span></a>
+  </div>
+  <div class="topbar-actions">
+    <a href="dashboard.html" style="color:rgba(255,255,255,.8);font-size:.88rem;">← Dashboard</a>
+    <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.8);" data-action="logout">Sair</button>
+  </div>
+</header>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-section">
+    <a href="dashboard.html" class="sidebar-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="perfil.html" class="sidebar-link active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Perfil
+    </a>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main-content">
+  <!-- Profile Hero -->
+  <div class="profile-hero mb-6">
+    <div class="profile-avatar-wrap">
+      <div id="profileAvatar" style="width:80px;height:80px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:var(--primary);cursor:pointer;" onclick="document.getElementById('avatarInput').click()">U</div>
+      <div class="profile-avatar-edit" onclick="document.getElementById('avatarInput').click()">✏</div>
+      <input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="uploadAvatar(this)">
+    </div>
+    <div>
+      <h2 id="profileName" style="color:#fff;margin-bottom:4px;">Carregando...</h2>
+      <p style="color:rgba(255,255,255,.6);font-size:.88rem;" id="profileEmail"></p>
+      <span class="badge" style="background:rgba(240,165,0,.2);color:var(--accent);margin-top:8px;" id="profileType">Aluno</span>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <!-- Edit Profile -->
+    <div class="card">
+      <div class="card-header"><h4>✏️ Editar Perfil</h4></div>
+      <div class="card-body">
+        <div id="profileAlert" class="hidden mb-4"></div>
+        <form id="profileForm" novalidate>
+          <div class="form-group">
+            <label class="form-label">Nome Completo</label>
+            <input type="text" id="editNome" class="form-control" placeholder="Seu nome completo">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" id="editEmail" class="form-control" placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefone</label>
+            <input type="tel" id="editTelefone" class="form-control" placeholder="84 000 0000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cidade</label>
+            <select id="editCidade" class="form-control">
+              <option value="">Selecionar cidade</option>
+              <option>Maputo</option>
+              <option>Matola</option>
+              <option>Beira</option>
+              <option>Nampula</option>
+              <option>Quelimane</option>
+              <option>Tete</option>
+              <option>Chimoio</option>
+              <option>Nacala</option>
+              <option>Lichinga</option>
+              <option>Pemba</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sobre mim</label>
+            <textarea id="editBio" class="form-control" rows="3" placeholder="Conte um pouco sobre você..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-accent btn-block">
+            💾 Salvar Alterações
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div>
+      <div class="card mb-4">
+        <div class="card-header"><h4>🔒 Segurança</h4></div>
+        <div class="card-body">
+          <div id="passAlert" class="hidden mb-4"></div>
+          <form id="passForm" novalidate>
+            <div class="form-group">
+              <label class="form-label">Senha Atual</label>
+              <input type="password" id="senhaAtual" class="form-control" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nova Senha</label>
+              <input type="password" id="novaSenha" class="form-control" placeholder="Mínimo 6 caracteres">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirmar Nova Senha</label>
+              <input type="password" id="confirmNovaSenha" class="form-control" placeholder="Repita a nova senha">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              🔄 Alterar Senha
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="card">
+        <div class="card-header"><h4>🔔 Notificações</h4></div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <div>
+                <div style="font-weight:600;font-size:.875rem;">Novos cursos</div>
+                <div class="text-muted text-xs">Receba alertas de novos cursos</div>
+              </div>
+              <input type="checkbox" id="notifCursos" checked style="width:18px;height:18px;">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <div>
+                <div style="font-weight:600;font-size:.875rem;">Promoções</div>
+                <div class="text-muted text-xs">Descontos e ofertas especiais</div>
+              </div>
+              <input type="checkbox" id="notifPromos" checked style="width:18px;height:18px;">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <div>
+                <div style="font-weight:600;font-size:.875rem;">Lembretes de estudo</div>
+                <div class="text-muted text-xs">Lembretes para manter consistência</div>
+              </div>
+              <input type="checkbox" id="notifLemb" style="width:18px;height:18px;">
+            </label>
+          </div>
+          <button class="btn btn-outline btn-block mt-4" onclick="saveNotifs()">Salvar Preferências</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="card mt-4" style="border:1px solid rgba(239,68,68,.3);">
+    <div class="card-header" style="background:rgba(239,68,68,.05);">
+      <h4 style="color:var(--danger);">⚠️ Zona de Perigo</h4>
+    </div>
+    <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      <div>
+        <div style="font-weight:600;margin-bottom:4px;">Apagar Conta</div>
+        <p class="text-muted text-sm">Esta ação é irreversível e apagará todos os seus dados.</p>
+      </div>
+      <button class="btn btn-danger" onclick="deleteAccount()">Apagar Minha Conta</button>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+let user;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const stored = localStorage.getItem('moz_user');
+  if (!stored) { window.location.href = 'login.html'; return; }
+  user = JSON.parse(stored);
+  App.currentUser = user;
+
+  populateProfile();
+});
+
+function populateProfile() {
+  document.getElementById('profileName').textContent = user.nome || 'Aluno';
+  document.getElementById('profileEmail').textContent = user.email || '';
+  document.getElementById('profileType').textContent = user.tipo === 'admin' ? 'Administrador' : 'Aluno';
+  document.getElementById('profileAvatar').textContent = (user.nome || 'U').charAt(0).toUpperCase();
+
+  document.getElementById('editNome').value = user.nome || '';
+  document.getElementById('editEmail').value = user.email || '';
+  document.getElementById('editTelefone').value = user.telefone || '';
+  document.getElementById('editBio').value = user.bio || '';
+  if (user.cidade) document.getElementById('editCidade').value = user.cidade;
+
+  if (user.foto) {
+    const av = document.getElementById('profileAvatar');
+    av.style.background = 'none';
+    av.innerHTML = `<img src="${user.foto}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">`;
+  }
+}
+
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const updates = {
+    nome: document.getElementById('editNome').value.trim(),
+    email: document.getElementById('editEmail').value.trim(),
+    telefone: document.getElementById('editTelefone').value.trim(),
+    cidade: document.getElementById('editCidade').value,
+    bio: document.getElementById('editBio').value.trim(),
+  };
+
+  try {
+    // Update in Supabase if available
+    if (supabase) {
+      await supabase.from('usuarios').update(updates).eq('id', user.id);
+    }
+    Object.assign(user, updates);
+    localStorage.setItem('moz_user', JSON.stringify(user));
+    App.currentUser = user;
+    populateProfile();
+    showAlert('profileAlert', 'Perfil atualizado com sucesso!', 'success');
+    App.toast('Perfil atualizado!', 'success');
+  } catch (err) {
+    showAlert('profileAlert', 'Erro ao atualizar perfil.', 'danger');
+  }
+});
+
+document.getElementById('passForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const atual = document.getElementById('senhaAtual').value;
+  const nova = document.getElementById('novaSenha').value;
+  const confirma = document.getElementById('confirmNovaSenha').value;
+
+  if (nova.length < 6) { showAlert('passAlert', 'Nova senha deve ter mínimo 6 caracteres.', 'warning'); return; }
+  if (nova !== confirma) { showAlert('passAlert', 'As senhas não coincidem.', 'warning'); return; }
+
+  try {
+    if (supabase) {
+      const { error } = await supabase.auth.updateUser({ password: nova });
+      if (error) throw error;
+    } else {
+      // Demo: update in localStorage
+      const users = JSON.parse(localStorage.getItem('moz_users') || '[]');
+      const u = users.find(u => u.id === user.id);
+      if (u) { u.senha = nova; localStorage.setItem('moz_users', JSON.stringify(users)); }
+    }
+    showAlert('passAlert', 'Senha alterada com sucesso!', 'success');
+    document.getElementById('passForm').reset();
+  } catch (err) {
+    showAlert('passAlert', err.message || 'Erro ao alterar senha.', 'danger');
+  }
+});
+
+function uploadAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    user.foto = dataUrl;
+    localStorage.setItem('moz_user', JSON.stringify(user));
+    populateProfile();
+    App.toast('Foto atualizada!', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveNotifs() {
+  App.toast('Preferências de notificação salvas!', 'success');
+}
+
+function deleteAccount() {
+  if (!confirm('Tem certeza? Esta ação apagará sua conta permanentemente.')) return;
+  if (!confirm('Confirma que deseja apagar sua conta?')) return;
+  localStorage.removeItem('moz_user');
+  const users = JSON.parse(localStorage.getItem('moz_users') || '[]').filter(u => u.id !== user.id);
+  localStorage.setItem('moz_users', JSON.stringify(users));
+  App.toast('Conta apagada.', 'success');
+  setTimeout(() => window.location.href = 'index.html', 1000);
+}
+
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.className = `alert alert-${type} mb-4`;
+  el.textContent = msg;
+  setTimeout(() => el.className = 'hidden', 4000);
+}
+</script>
+</body>
+</html>

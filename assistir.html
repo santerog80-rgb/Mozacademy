@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assistir - MozAcademy</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .watch-layout { display: grid; grid-template-columns: 1fr 320px; gap: 0; min-height: 100vh; margin-top: var(--topbar-h); }
+    .watch-main { padding: 24px; background: var(--surface-2); }
+    .watch-sidebar { background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; max-height: calc(100vh - var(--topbar-h)); overflow-y: auto; }
+    .watch-sidebar-header { padding: 16px 18px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: .9rem; position: sticky; top: 0; background: var(--surface); z-index: 10; }
+    @media (max-width: 900px) {
+      .watch-layout { grid-template-columns: 1fr; }
+      .watch-sidebar { max-height: 400px; border-left: none; border-top: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Topbar -->
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a href="#" onclick="goBack()" style="color:rgba(255,255,255,.7);display:flex;align-items:center;gap:6px;font-size:.88rem;">← Voltar</a>
+    <a href="index.html" class="topbar-brand" style="font-size:1.2rem;">Moz<span>Academy</span></a>
+  </div>
+  <div style="flex:1;text-align:center;">
+    <div id="courseNameTop" style="color:rgba(255,255,255,.8);font-size:.88rem;font-weight:500;"></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;">
+      <div class="progress-wrap" style="width:200px;"><div class="progress-bar" id="topProgress" style="width:0%;"></div></div>
+      <span style="font-size:.75rem;color:rgba(255,255,255,.5);" id="topProgressLabel">0%</span>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7);" onclick="markDoneAndNext()">✓ Concluir e Avançar</button>
+  </div>
+</header>
+
+<!-- Watch Layout -->
+<div class="watch-layout">
+
+  <!-- Main Player -->
+  <div class="watch-main">
+    <!-- Video -->
+    <div class="video-container mb-4" id="videoContainer">
+      <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+    </div>
+
+    <!-- Lesson Info -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+          <div>
+            <div class="badge badge-accent mb-2" id="lessonChapter">Módulo</div>
+            <h2 id="lessonTitle" style="font-size:1.3rem;margin-bottom:8px;">Carregando...</h2>
+            <p class="text-muted text-sm" id="lessonDuration">Duração: --</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" id="prevBtn" onclick="prevLesson()">← Anterior</button>
+            <button class="btn btn-outline btn-sm" id="nextBtn" onclick="nextLesson()">Próxima →</button>
+            <button class="btn btn-success btn-sm" id="doneBtn" onclick="markDone()">✓ Marcar Concluída</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PDF Resources -->
+    <div id="pdfSection" class="card hidden">
+      <div class="card-header"><h4>📄 Material Complementar</h4></div>
+      <div class="card-body" id="pdfContent"></div>
+    </div>
+
+    <!-- Notes -->
+    <div class="card mt-4">
+      <div class="card-header"><h4>📝 Minhas Anotações</h4></div>
+      <div class="card-body">
+        <textarea id="noteArea" class="form-control" rows="4" placeholder="Escreva suas anotações aqui... (salvamento automático)"></textarea>
+        <button class="btn btn-outline btn-sm mt-4" onclick="saveNote()">💾 Salvar Nota</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar Lesson List -->
+  <div class="watch-sidebar">
+    <div class="watch-sidebar-header">
+      <div>Conteúdo do Curso</div>
+      <div style="font-size:.75rem;color:var(--text-muted);font-weight:400;margin-top:2px;" id="sidebarProgress">0 de 0 concluídas</div>
+    </div>
+    <div id="sidebarLessons">
+      <div style="padding:24px;text-align:center;">
+        <div class="spinner" style="margin:0 auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+let user, courseId, currentLessonId, lessons = [], progress = [], course;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const stored = localStorage.getItem('moz_user');
+  if (!stored) { window.location.href = 'login.html'; return; }
+  user = JSON.parse(stored);
+
+  courseId = Utils.getQueryParam('id');
+  currentLessonId = Utils.getQueryParam('aula');
+
+  if (!courseId) { window.location.href = 'dashboard.html'; return; }
+
+  // Check enrollment
+  const enrolled = await DB.isEnrolled(user.id, courseId);
+  if (!enrolled) { window.location.href = `curso.html?id=${courseId}`; return; }
+
+  course = await DB.getCourse(courseId);
+  lessons = await DB.getLessons(courseId);
+  progress = await DB.getProgress(user.id, courseId);
+  if (Array.isArray(progress) && progress.length && typeof progress[0] === 'object') {
+    progress = progress.map(p => p.aula_id);
+  }
+
+  if (!currentLessonId && lessons.length) {
+    // Resume: find first uncompleted
+    const next = lessons.find(l => !progress.includes(l.id));
+    currentLessonId = (next || lessons[0]).id;
+  }
+
+  document.getElementById('courseNameTop').textContent = course?.titulo || 'Curso';
+  renderSidebar();
+  loadLesson(currentLessonId);
+});
+
+function loadLesson(lessonId) {
+  currentLessonId = lessonId;
+  const lesson = lessons.find(l => l.id == lessonId);
+  if (!lesson) return;
+
+  // Update URL
+  history.replaceState(null, '', `?id=${courseId}&aula=${lessonId}`);
+
+  // Update player
+  document.getElementById('lessonTitle').textContent = lesson.titulo;
+  document.getElementById('lessonChapter').textContent = lesson.capitulo || 'Módulo';
+  document.getElementById('lessonDuration').textContent = `Duração: ${lesson.duracao || '~15 min'}`;
+
+  const player = document.getElementById('videoPlayer');
+  if (lesson.video_url) {
+    player.src = lesson.video_url;
+    document.getElementById('videoContainer').style.display = '';
+  } else {
+    document.getElementById('videoContainer').style.display = 'none';
+  }
+
+  // PDF
+  const pdfSection = document.getElementById('pdfSection');
+  const pdfContent = document.getElementById('pdfContent');
+  if (lesson.pdf_url) {
+    pdfSection.classList.remove('hidden');
+    pdfContent.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <span style="font-size:.88rem;">📄 ${lesson.titulo} - Material.pdf</span>
+        <div style="display:flex;gap:8px;">
+          <a href="${lesson.pdf_url}" target="_blank" class="btn btn-outline btn-sm">👁 Visualizar</a>
+          <a href="${lesson.pdf_url}" download class="btn btn-primary btn-sm">⬇ Download</a>
+        </div>
+      </div>
+    `;
+  } else {
+    pdfSection.classList.add('hidden');
+  }
+
+  // Load note
+  const note = localStorage.getItem(`moz_note_${courseId}_${lessonId}`) || '';
+  document.getElementById('noteArea').value = note;
+
+  // Done button
+  const isDone = progress.includes(lessonId);
+  const doneBtn = document.getElementById('doneBtn');
+  if (isDone) {
+    doneBtn.textContent = '✓ Concluída';
+    doneBtn.className = 'btn btn-success btn-sm';
+    doneBtn.disabled = true;
+  } else {
+    doneBtn.textContent = '✓ Marcar Concluída';
+    doneBtn.className = 'btn btn-outline btn-sm';
+    doneBtn.disabled = false;
+  }
+
+  // Prev/Next
+  const idx = lessons.findIndex(l => l.id == lessonId);
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx === lessons.length - 1;
+
+  // Update sidebar active
+  document.querySelectorAll('.lesson-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.lessonId == lessonId);
+  });
+
+  // Save "last position"
+  localStorage.setItem(`moz_last_${courseId}`, lessonId);
+}
+
+async function markDone() {
+  if (progress.includes(currentLessonId)) return;
+  await DB.markLessonDone(user.id, courseId, currentLessonId);
+  progress.push(currentLessonId);
+  updateProgress();
+  loadLesson(currentLessonId);
+  renderSidebar();
+  App.toast('Aula marcada como concluída!', 'success');
+
+  // Check if all done
+  if (progress.length === lessons.length) {
+    setTimeout(() => {
+      App.toast('🎉 Parabéns! Você concluiu o curso!', 'success');
+    }, 500);
+  }
+}
+
+function markDoneAndNext() {
+  markDone().then(() => {
+    const idx = lessons.findIndex(l => l.id == currentLessonId);
+    if (idx < lessons.length - 1) loadLesson(lessons[idx + 1].id);
+  });
+}
+
+function prevLesson() {
+  const idx = lessons.findIndex(l => l.id == currentLessonId);
+  if (idx > 0) loadLesson(lessons[idx - 1].id);
+}
+function nextLesson() {
+  const idx = lessons.findIndex(l => l.id == currentLessonId);
+  if (idx < lessons.length - 1) loadLesson(lessons[idx + 1].id);
+}
+
+function renderSidebar() {
+  const container = document.getElementById('sidebarLessons');
+  const chapters = {};
+  lessons.forEach(l => {
+    const ch = l.capitulo || 'Módulo 1';
+    if (!chapters[ch]) chapters[ch] = [];
+    chapters[ch].push(l);
+  });
+
+  container.innerHTML = Object.entries(chapters).map(([ch, aulas]) => `
+    <div class="lesson-chapter">
+      <div class="lesson-chapter-header">
+        <span>${ch}</span>
+        <span style="font-size:.75rem;color:var(--text-muted);">${aulas.filter(a => progress.includes(a.id)).length}/${aulas.length}</span>
+      </div>
+      ${aulas.map(a => {
+        const done = progress.includes(a.id);
+        const active = a.id == currentLessonId;
+        return `
+          <div class="lesson-item ${active ? 'active' : ''} ${done ? 'done' : ''}" data-lesson-id="${a.id}" onclick="loadLesson('${a.id}')">
+            <div class="lesson-check">${done ? '✓' : ''}</div>
+            <div style="flex:1;line-height:1.4;font-size:.82rem;">${a.titulo}</div>
+            <span class="lesson-duration">${a.duracao || ''}</span>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `).join('');
+
+  updateProgress();
+}
+
+function updateProgress() {
+  const pct = lessons.length ? Math.round((progress.length / lessons.length) * 100) : 0;
+  document.getElementById('topProgress').style.width = pct + '%';
+  document.getElementById('topProgressLabel').textContent = pct + '%';
+  document.getElementById('sidebarProgress').textContent = `${progress.length} de ${lessons.length} concluídas`;
+}
+
+function saveNote() {
+  const note = document.getElementById('noteArea').value;
+  localStorage.setItem(`moz_note_${courseId}_${currentLessonId}`, note);
+  App.toast('Nota salva!', 'success');
+}
+
+// Auto-save note
+document.addEventListener('DOMContentLoaded', () => {
+  setInterval(() => {
+    const note = document.getElementById('noteArea')?.value;
+    if (note && courseId && currentLessonId) {
+      localStorage.setItem(`moz_note_${courseId}_${currentLessonId}`, note);
+    }
+  }, 10000);
+});
+
+function goBack() {
+  if (courseId) window.location.href = `curso.html?id=${courseId}`;
+  else window.history.back();
+}
+</script>
+</body>
+</html>

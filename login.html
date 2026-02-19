@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - MozAcademy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+
+<div class="auth-card">
+  <!-- Logo -->
+  <div class="auth-logo">Moz<span>Academy</span></div>
+  <p class="auth-tagline">Bem-vindo de volta! Entre na sua conta.</p>
+
+  <!-- Alert -->
+  <div id="alertBox" class="hidden"></div>
+
+  <!-- Form -->
+  <form id="loginForm" novalidate>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <div class="input-group">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <input type="email" id="email" class="form-control" placeholder="seu@email.com" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" style="display:flex;justify-content:space-between;">
+        Senha
+        <a href="#" onclick="showForgotPassword()" style="color:var(--accent);font-weight:500;font-size:.82rem;">Esqueceu a senha?</a>
+      </label>
+      <div class="input-group">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="senha" class="form-control" placeholder="••••••••" required>
+        <button type="button" onclick="togglePassword()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);" id="passToggle">👁</button>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+      <input type="checkbox" id="remember" style="width:16px;height:16px;cursor:pointer;">
+      <label for="remember" style="font-size:.875rem;cursor:pointer;">Lembrar de mim</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block btn-lg" id="loginBtn">
+      <span id="loginBtnText">Entrar</span>
+      <span id="loginSpinner" class="spinner hidden" style="width:18px;height:18px;border-width:2px;"></span>
+    </button>
+
+    <div class="auth-divider">ou continue com</div>
+
+    <!-- Admin quick access -->
+    <button type="button" class="btn btn-outline btn-block mb-3" onclick="fillAdmin()">
+      🛡️ Entrar como Admin (Demo)
+    </button>
+    <button type="button" class="btn btn-outline btn-block" onclick="fillDemo()">
+      👤 Entrar como Aluno (Demo)
+    </button>
+  </form>
+
+  <p style="text-align:center; margin-top:24px; font-size:.875rem; color:var(--text-secondary);">
+    Não tem conta? <a href="cadastro.html" style="color:var(--accent); font-weight:600;">Cadastre-se grátis</a>
+  </p>
+  <p style="text-align:center; margin-top:10px;">
+    <a href="index.html" style="font-size:.82rem; color:var(--text-muted);">← Voltar ao início</a>
+  </p>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <span class="modal-title">Recuperar Senha</span>
+      <button class="modal-close" onclick="closeForgot()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="text-muted mb-4">Digite seu email e enviaremos um link para redefinir sua senha.</p>
+      <div class="form-group">
+        <label class="form-label">Email cadastrado</label>
+        <input type="email" id="forgotEmail" class="form-control" placeholder="seu@email.com">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeForgot()">Cancelar</button>
+      <button class="btn btn-accent" onclick="sendReset()">Enviar Link</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const btn = document.getElementById('loginBtn');
+  const btnText = document.getElementById('loginBtnText');
+  const spinner = document.getElementById('loginSpinner');
+  const alertBox = document.getElementById('alertBox');
+
+  if (!email || !senha) {
+    showAlert('Por favor, preencha todos os campos.', 'danger');
+    return;
+  }
+
+  btn.disabled = true;
+  btnText.textContent = 'Entrando...';
+  spinner.classList.remove('hidden');
+  alertBox.className = 'hidden';
+
+  try {
+    const user = await DB.loginUser(email, senha);
+    // Save to localStorage for demo mode
+    localStorage.setItem('moz_user', JSON.stringify(user));
+    App.currentUser = user;
+
+    App.toast('Login realizado com sucesso!', 'success');
+
+    const redirect = Utils.getQueryParam('redirect');
+    setTimeout(() => {
+      if (user.tipo === 'admin') {
+        window.location.href = redirect || 'admin.html';
+      } else {
+        window.location.href = redirect || 'dashboard.html';
+      }
+    }, 800);
+  } catch (err) {
+    showAlert(err.message || 'Email ou senha incorretos. Tente novamente.', 'danger');
+    btn.disabled = false;
+    btnText.textContent = 'Entrar';
+    spinner.classList.add('hidden');
+  }
+});
+
+function showAlert(msg, type) {
+  const box = document.getElementById('alertBox');
+  box.className = `alert alert-${type} mb-4`;
+  box.textContent = msg;
+}
+
+function togglePassword() {
+  const input = document.getElementById('senha');
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function fillAdmin() {
+  document.getElementById('email').value = 'admin@mozacademy.co.mz';
+  document.getElementById('senha').value = 'Admin@2024';
+}
+
+function fillDemo() {
+  // Create demo user if doesn't exist
+  const users = JSON.parse(localStorage.getItem('moz_users') || '[]');
+  if (!users.find(u => u.email === 'aluno@demo.mz')) {
+    users.push({ id: 'demo-1', nome: 'Aluno Demo', email: 'aluno@demo.mz', senha: 'Demo@123', tipo: 'aluno', foto: null });
+    localStorage.setItem('moz_users', JSON.stringify(users));
+  }
+  document.getElementById('email').value = 'aluno@demo.mz';
+  document.getElementById('senha').value = 'Demo@123';
+}
+
+function showForgotPassword() {
+  document.getElementById('forgotModal').classList.add('open');
+}
+function closeForgot() {
+  document.getElementById('forgotModal').classList.remove('open');
+}
+async function sendReset() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!email) { App.toast('Digite um email válido.', 'warning'); return; }
+  try {
+    if (supabase) {
+      await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/login.html' });
+    }
+    App.toast('Link de recuperação enviado! Verifique seu email.', 'success');
+    closeForgot();
+  } catch (err) {
+    App.toast('Erro ao enviar email. Tente novamente.', 'error');
+  }
+}
+</script>
+</body>
+</html>
