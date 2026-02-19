@@ -5,8 +5,8 @@
 
 // ── Supabase Configuration ──
 // IMPORTANT: Replace with your actual Supabase project URL and anon key
-const SUPABASE_URL = 'https://fwacwpwdqkmykowxmffx.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_ci9XWHYXUqk01PZT5Jp0ug_VIrzP9cd';
+const SUPABASE_URL = 'https://ffvwqhxcllhzqhmxirbk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_WZTLOZz-_ndF7NyB6KQ40w_hR9TS7OP';
 
 // Initialize Supabase client
 let supabase;
